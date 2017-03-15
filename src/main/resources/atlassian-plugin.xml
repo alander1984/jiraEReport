@@ -1,24 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
-    <plugin-info>
-        <description>${project.description}</description>
-        <version>${project.version}</version>
-        <vendor name="${project.organization.name}" url="${project.organization.url}" />
-        <param name="plugin-icon">images/pluginIcon.png</param>
-        <param name="plugin-logo">images/pluginLogo.png</param>
-    </plugin-info>
-
-    <!-- add our i18n resource -->
-    <resource type="i18n" name="i18n" location="mreport"/>
-    
-    <!-- add our web resources -->
-    <web-resource key="mreport-resources" name="mreport Web Resources">
-        <dependency>com.atlassian.auiplugin:ajs</dependency>
-        
-        <resource type="download" name="mreport.css" location="/css/mreport.css"/>
-        <resource type="download" name="mreport.js" location="/js/mreport.js"/>
-        <resource type="download" name="images/" location="/images"/>
-
-        <context>mreport</context>
-    </web-resource>
-    
+  <plugin-info>
+    <description>${project.description}</description>
+    <version>${project.version}</version>
+    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    <param name="plugin-icon">images/pluginIcon.png</param>
+    <param name="plugin-logo">images/pluginLogo.png</param>
+  </plugin-info>
+  <!-- add our i18n resource -->
+  <resource type="i18n" name="i18n" location="mreport"/>
+  <!-- add our web resources -->
+  <web-resource key="mreport-resources" name="mreport Web Resources">
+    <dependency>com.atlassian.auiplugin:ajs</dependency>
+    <resource type="download" name="mreport.css" location="/css/mreport.css"/>
+    <resource type="download" name="mreport.js" location="/js/mreport.js"/>
+    <resource type="download" name="images/" location="/images"/>
+    <context>mreport</context>
+  </web-resource>
+  <web-section name="egFeatureView" i18n-name-key="eg-feature-view.name" key="eg-feature-view" location="egfeatureview" weight="1000">
+    <description key="eg-feature-view.description">The egFeatureView Plugin</description>
+    <label key="eg-feature-view.label"/>
+  </web-section>
+  <web-item name="egFeatureItem" i18n-name-key="eg-feature-item.name" key="eg-feature-item" section="system.top.navigation.bar" weight="1000">
+    <description key="eg-feature-item.description">The egFeatureItem Plugin</description>
+    <label key="eg-feature-item.label">Спец. возможности</label>
+    <link linkId="eg-feature-item-link">egfeature</link>
+  </web-item>
+  <servlet key="admin-servlet" class="egartech.EGFeature">
+    <url-pattern>/secure/egfeature</url-pattern>
+  </servlet>
 </atlassian-plugin>
