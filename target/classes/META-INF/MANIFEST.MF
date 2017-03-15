@@ -1,0 +1,36 @@
+Manifest-Version: 1.0
+Atlassian-Build-Date: 2017-03-13T16:48:43+0400
+Atlassian-Plugin-Key: com.mreport
+Bnd-LastModified: 1489409325011
+Build-Jdk: 1.8.0_121
+Built-By: alander
+Bundle-Description: This is the com:mreport plugin for Atlassian JIRA.
+Bundle-DocURL: http://www.example.com/
+Bundle-ManifestVersion: 2
+Bundle-Name: mreport
+Bundle-SymbolicName: com.mreport
+Bundle-Vendor: Example Company
+Bundle-Version: 1.0.0.SNAPSHOT
+Created-By: Apache Maven Bundle Plugin
+Export-Package: egartech.api;version="1.0.0"
+Import-Package: org.springframework.osgi.context;resolution:=optional,or
+ g.springframework.osgi.service.exporter.support;resolution:=optional,or
+ g.springframework.osgi.service.importer.support;resolution:=optional,or
+ g.eclipse.gemini.blueprint.context;resolution:=optional,org.eclipse.gem
+ ini.blueprint.service.exporter;resolution:=optional,org.eclipse.gemini.
+ blueprint.service.exporter.support;resolution:=optional,org.eclipse.gem
+ ini.blueprint.service.importer.support;resolution:=optional,com.atlassi
+ an.plugin.osgi.factory,com.atlassian.sal.api,com.google.common.base,com
+ .google.common.collect,egartech.api;version="[1.0,2)",javax.annotation,
+ javax.inject,org.apache.commons.lang,org.apache.commons.logging,org.osg
+ i.framework,org.springframework.aop.support,org.springframework.beans,o
+ rg.springframework.beans.factory,org.springframework.beans.factory.anno
+ tation,org.springframework.beans.factory.config,org.springframework.bea
+ ns.factory.parsing,org.springframework.beans.factory.support,org.spring
+ framework.beans.factory.xml,org.springframework.context.annotation,org.
+ springframework.core.io,org.springframework.stereotype,org.springframew
+ ork.util,org.w3c.dom
+Originally-Created-By: Apache Maven Bundle Plugin
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.6))"
+Spring-Context: *
+Tool: Bnd-2.4.1.201501161923
