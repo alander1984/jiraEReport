@@ -25,9 +25,9 @@
   <web-item name="egFeatureItem" i18n-name-key="eg-feature-item.name" key="eg-feature-item" section="system.top.navigation.bar" weight="1000">
     <description key="eg-feature-item.description">The egFeatureItem Plugin</description>
     <label key="eg-feature-item.label">Спец. возможности</label>
-    <link linkId="eg-feature-item-link">egfeature</link>
+    <link linkId="eg-feature-item-link">/plugins/servlet/egfeaturelink</link>
   </web-item>
-  <servlet key="admin-servlet" class="egartech.EGFeature">
-    <url-pattern>/secure/egfeature</url-pattern>
+  <servlet key="admin-servlet" class="egartech.mreport.EGFeature">
+    <url-pattern>/egfeaturelink</url-pattern>
   </servlet>
 </atlassian-plugin>
