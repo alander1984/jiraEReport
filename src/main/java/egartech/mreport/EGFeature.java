@@ -26,6 +26,7 @@ public class EGFeature extends HttpServlet{
     @ComponentImport
     private final TemplateRenderer renderer;
 
+    @Inject
     public EGFeature(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer)
     {
         this.userManager = userManager;
@@ -33,10 +34,35 @@ public class EGFeature extends HttpServlet{
         this.renderer = renderer;
     }
 
+
+    private URI getUri(HttpServletRequest request)
+    {
+        StringBuffer builder = request.getRequestURL();
+        if (request.getQueryString() != null)
+        {
+            builder.append("?");
+            builder.append(request.getQueryString());
+        }
+        return URI.create(builder.toString());
+    }
+
+    private void redirectToLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
+    {
+        response.sendRedirect(loginUriProvider.getLoginUri(getUri(request)).toASCIIString());
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("Entering into custom EGAR JIRA servlet");
-        super.doGet(req, resp);
+        String username = userManager.getRemoteUsername(req);
+        if (username == null || !userManager.isSystemAdmin(username))
+        {
+            redirectToLogin(req, resp);
+            return;
+        }
+
+        resp.setContentType("text/html;charset=utf-8");
+        renderer.render("egfeature.vm", resp.getWriter());
     }
 
     @Override
