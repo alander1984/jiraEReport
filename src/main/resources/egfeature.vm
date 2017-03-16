@@ -12,22 +12,41 @@
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 </head>
 <body>
     <div class="globalpage">
         <form id="special_report">
             <h1>Special features</h1>
             <h3>Time report in EGAR format</h3>
-            <div class="form-group row col-sm-5">
-                <div class="col-sm-6 row">
-                    <label>Start</label>
-                    <input type="text" class="form-control" placeholder="DD.MM.YYY">
-                </div>
-                <div class="col-sm-6 row">
-                    <label>End</label>
-                    <input type="text" class="form-control" placeholder="DD.MM.YYY">
-                </div>
-            </div>
+            <table>
+                <tr>
+                    <td>
+                        <div class="spaceddiv">
+                            <label>Start</label>
+                            <input type="text" class="form-control" placeholder="DD.MM.YYYY">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="spaceddiv">
+                            <label>End</label>
+                            <input type="text" class="form-control" placeholder="DD.MM.YYYY">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="spaceddiv">
+                            <button type="button" class="btn btn-primary" aria-label="Left Align" onclick="submitReportForm();">
+                                <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> Download xls
+                            </button>
+                        </div>
+                    </td>
+                    <td>
+                        <div id="reportResult"></div>
+                    </td>
+                </tr>
+            </table>
         </form>
     </div>
 </body>
