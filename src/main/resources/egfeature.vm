@@ -24,13 +24,13 @@
                     <td>
                         <div class="spaceddiv">
                             <label>Start</label>
-                            <input type="text" class="form-control" placeholder="DD.MM.YYYY">
+                            <input type="text" class="form-control" placeholder="DD.MM.YYYY" name="sdate">
                         </div>
                     </td>
                     <td>
                         <div class="spaceddiv">
                             <label>End</label>
-                            <input type="text" class="form-control" placeholder="DD.MM.YYYY">
+                            <input type="text" class="form-control" placeholder="DD.MM.YYYY" name="edate">
                         </div>
                     </td>
                 </tr>
