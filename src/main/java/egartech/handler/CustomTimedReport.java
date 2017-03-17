@@ -6,6 +6,7 @@ import java.sql.*;
 import java.util.Date;
 
 import com.atlassian.jira.database.DatabaseConnection;
+import egartech.api.Utils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -31,21 +32,7 @@ public class CustomTimedReport {
         rowhead.createCell(2).setCellFormula("B1+B2");
         rowhead.createCell(3).setCellValue("Email");
         try {
-            Class.forName("org.postgresql.Driver");
-            Connection connection = null;
-            try {
-
-                connection = DriverManager.getConnection(
-                        "jdbc:postgresql://127.0.0.1:5432/jiradb", "postgres",
-                        "postgresql17");
-
-            } catch (SQLException e) {
-
-                System.out.println("Connection Failed! Check output console");
-                e.printStackTrace();
-                return;
-
-            }
+            Connection connection = Utils.getConnection();
             if (connection != null) {
                 String sql = "SELECT PNAME FROM PROJECT";
                 try{
