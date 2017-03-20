@@ -9,7 +9,7 @@ import java.sql.SQLException;
  */
 public class Utils {
 
-    public static Connection getConnection() throws ClassNotFoundException {
+    public static Connection getPostgresConnection() throws ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
         Connection connection = null;
         try {
@@ -25,5 +25,24 @@ public class Utils {
         }
         return connection;
     }
+
+
+    public static Connection getMsSQLConnection() throws ClassNotFoundException {
+        Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        Connection connection = null;
+        try {
+
+            connection = DriverManager.getConnection(
+                    "jdbc:sqlserver://sql3.egar.egartech.com:1433;databaseName=jira6_4_1", "testuser",
+                    "Test1234");
+
+        } catch (SQLException e) {
+
+            System.out.println("Connection Failed! Check output console");
+            e.printStackTrace();
+        }
+        return connection;
+    }
+
 
 }

@@ -3,6 +3,7 @@ package egartech.handler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.atlassian.jira.database.DatabaseConnection;
@@ -11,9 +12,6 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-import javax.inject.Inject;
-import javax.naming.Context;
-import javax.sql.DataSource;
 
 
 
@@ -54,14 +52,25 @@ public class CustomTimedReport {
             /*
             MSSQL = select s.author,sum(s.timeworked),s.agreement, s._date from (select w.*, cfv.stringvalue as agreement, right(convert(varchar, w.created, 106), 8)  _date from worklog w left join customfieldvalue cfv on w.issueid=cfv.issuewhere w.created between '01.01.2017' and '01.12.2017' ) s group by author,agreement, _date
              */
-            Connection connection = Utils.getConnection();
+            Connection connection = Utils.getMsSQLConnection();
             if (connection != null) {
+                /* Postgre here
                 String sql = "select s.author,sum(s.timeworked) as spent,s.agreement, s._month, s._year from (\n" +
                         "\tselect w.*, cfv.stringvalue as agreement, extract(month from w.created) as _month, extract(year from w.created) as _year from worklog w left join customfieldvalue cfv on w.issueid=cfv.issue\n" +
-                        "\twhere w.created between '01.01.2017' and '01.12.2017') as s\n" +
-                        "group by author,agreement, _month, _year order by author";
+                        "\twhere w.created between ? and ?) as s\n" +
+                        "group by author,agreement, _month, _year order by author";*/
+                String sql = "select s.author,sum(s.timeworked) as spent,s.agreement, s._month, s._year from (select w.*, cfv.stringvalue as agreement, \n" +
+                        "month(w.created) as _month, year(w.created) as _year \n" +
+                        "from worklog w left join customfieldvalue cfv on w.issueid=cfv.issue\n" +
+                        "\twhere w.created between ? and ?) as s group by author,agreement, _month, _year order by author";
+
                 try{
                     PreparedStatement statement = connection.prepareStatement(sql);
+                    java.sql.Date ssdate = new java.sql.Date(sdate.getTime());
+                    java.sql.Date sedate = new java.sql.Date(edate.getTime());
+                    System.out.println(ssdate.toString() +" : "+sedate.toString());
+                    statement.setDate(1, ssdate);
+                    statement.setDate(2, sedate);
                     ResultSet rs = statement.executeQuery();
                     while (rs.next()) {
                         System.out.println("1");

@@ -6,6 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import javax.inject.Inject;
@@ -60,9 +63,10 @@ public class EGFeature extends HttpServlet{
             redirectToLogin(req, resp);
             return;
         }
-
+        final Map<String, Object> context = new HashMap<String, Object>();
+        context.put("groups", "Your Value");
         resp.setContentType("text/html;charset=utf-8");
-        renderer.render("egfeature.vm", resp.getWriter());
+        renderer.render( "egfeature.vm", context, resp.getWriter());
     }
 
     @Override

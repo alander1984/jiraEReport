@@ -21,6 +21,16 @@
             <h3>Time report in EGAR format</h3>
             <table>
                 <tr>
+                   <!-- <td>
+                        <div class="spaceddiv">
+                            <label>Group</label>
+                            <select class="selectpicker" data-live-search="true">
+                                <option data-tokens="11">$yourVarName</option>
+                                <option data-tokens="22">Gomel</option>
+                            </select>
+
+                        </div>
+                    </td>-->
                     <td>
                         <div class="spaceddiv">
                             <label>Start</label>
