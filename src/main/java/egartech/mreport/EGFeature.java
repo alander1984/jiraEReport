@@ -7,14 +7,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+import com.atlassian.jira.security.groups.GroupManager;
+import com.atlassian.jira.user.ApplicationUser;
 import com.atlassian.sal.api.auth.LoginUriProvider;
 import com.atlassian.templaterenderer.TemplateRenderer;
 import javax.inject.Inject;
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 import com.atlassian.sal.api.user.UserManager;
+import com.atlassian.crowd.embedded.api.Group;
 /**
  * Created by alander on 15.03.17.
  */
@@ -28,13 +32,16 @@ public class EGFeature extends HttpServlet{
     private final LoginUriProvider loginUriProvider;
     @ComponentImport
     private final TemplateRenderer renderer;
+    @ComponentImport
+    private final GroupManager groupManager;
 
     @Inject
-    public EGFeature(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer)
+    public EGFeature(UserManager userManager, LoginUriProvider loginUriProvider, TemplateRenderer renderer, GroupManager groupManager)
     {
         this.userManager = userManager;
         this.loginUriProvider = loginUriProvider;
         this.renderer = renderer;
+        this.groupManager = groupManager;
     }
 
 
@@ -58,15 +65,28 @@ public class EGFeature extends HttpServlet{
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("Entering into custom EGAR JIRA servlet");
         String username = userManager.getRemoteUsername(req);
-        if (username == null || !userManager.isSystemAdmin(username))
-        {
+        if (username == null/* || !userManager.isSystemAdmin(username)*/) {
             redirectToLogin(req, resp);
             return;
         }
-        final Map<String, Object> context = new HashMap<String, Object>();
-        context.put("groups", "Your Value");
-        resp.setContentType("text/html;charset=utf-8");
-        renderer.render( "egfeature.vm", context, resp.getWriter());
+        Boolean avalPlugin = false;
+        for (Iterator<Group> i = groupManager.getGroupsForUser(username).iterator(); i.hasNext();) {
+            Group g = (Group)i.next();
+            avalPlugin = (g.getName().compareTo("egarinternal"))==0;
+            if (avalPlugin) {
+                break;
+            }
+        }
+        if (!avalPlugin) {
+            resp.setContentType("text/html;charset=utf-8");
+            renderer.render( "accessdenied.vm", resp.getWriter());
+        }
+        else {
+            final Map<String, Object> context = new HashMap<String, Object>();
+            context.put("groups", "Your Value");
+            resp.setContentType("text/html;charset=utf-8");
+            renderer.render("egfeature.vm", context, resp.getWriter());
+        }
     }
 
     @Override

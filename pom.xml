@@ -132,6 +132,15 @@
             <version>4.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.atlassian.crowd/embedded-crowd-api -->
+        <dependency>
+            <groupId>com.atlassian.crowd</groupId>
+            <artifactId>embedded-crowd-api</artifactId>
+            <version>2.9.5</version>
+            <scope>provided</scope>
+        </dependency>
+
+
 
     </dependencies>
     <build>

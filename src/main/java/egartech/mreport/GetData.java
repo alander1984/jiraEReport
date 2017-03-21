@@ -58,7 +58,7 @@ public class GetData extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("GetDataServlet executing");
         String username = userManager.getRemoteUsername(req);
-        if (username == null || !userManager.isSystemAdmin(username))
+        if (username == null)
         {
             redirectToLogin(req, resp);
             return;

@@ -59,10 +59,20 @@ public class CustomTimedReport {
                         "\tselect w.*, cfv.stringvalue as agreement, extract(month from w.created) as _month, extract(year from w.created) as _year from worklog w left join customfieldvalue cfv on w.issueid=cfv.issue\n" +
                         "\twhere w.created between ? and ?) as s\n" +
                         "group by author,agreement, _month, _year order by author";*/
-                String sql = "select s.author,sum(s.timeworked) as spent,s.agreement, s._month, s._year from (select w.*, cfv.stringvalue as agreement, \n" +
-                        "month(w.created) as _month, year(w.created) as _year \n" +
-                        "from worklog w left join customfieldvalue cfv on w.issueid=cfv.issue\n" +
-                        "\twhere w.created between ? and ?) as s group by author,agreement, _month, _year order by author";
+/*
+                String sql = "select s.author,sum(s.timeworked)/3600 as spent,s.agreement, s._month, s._year from " +
+                        "(select w.*, cfv.stringvalue as agreement, month(w.created) as _month, year(w.created) as _year " +
+                        "from worklog w left join customfieldvalue cfv on w.issueid=cfv.issue left join customfield cf on cfv.customfield = cf.id " +
+                        "where cf.cfname='Agreement' and w.created between ? and ?) as s group by author,agreement, _month, _year order by author";
+*/
+
+                String sql = "select f.stringvalue agreement, month(w.created) as _month, year(w.created) as _year, u.display_name as author, "+
+                        "sum(w.timeworked) as spent from jiraissue i   " +
+                        "left join (select cfv.issue as issueid, cfv.stringvalue from customfieldvalue cfv " +
+                        "left outer join customfield cf on cfv.customfield = cf.id where cf.cfname='Agreement') f on f.issueid=i.id " +
+                        "left join worklog w on w.issueid=i.id left join cwd_user u on u.user_name=w.author "+
+                        "where u.user_name is not null and w.created between ? and ?" +
+                        " group by u.display_name,f.stringvalue, month(w.created), year(w.created)";
 
                 try{
                     PreparedStatement statement = connection.prepareStatement(sql);
@@ -98,8 +108,10 @@ public class CustomTimedReport {
                         row.createCell(1).setCellValue(rs.getString("_MONTH")+"."+rs.getString("_YEAR"));
                         row.createCell(2).setCellValue("Employee");
                         row.createCell(3).setCellValue(rs.getString("AUTHOR"));
-                        row.createCell(4).setCellValue(100);
-                        row.createCell(5).setCellValue(rs.getInt("SPENT"));
+                        if (startCWindex==irow) {
+                            row.createCell(4).setCellValue(100);
+                        }
+                        row.createCell(5).setCellValue(Math.round(rs.getInt("SPENT")/3600));
                         row.createCell(6).setCellValue(0);
                         row.createCell(7).setCellValue(0);
                         row.createCell(8).setCellValue(0);
