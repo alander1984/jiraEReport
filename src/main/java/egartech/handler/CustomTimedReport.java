@@ -52,27 +52,27 @@ public class CustomTimedReport {
             /*
             MSSQL = select s.author,sum(s.timeworked),s.agreement, s._date from (select w.*, cfv.stringvalue as agreement, right(convert(varchar, w.created, 106), 8)  _date from worklog w left join customfieldvalue cfv on w.issueid=cfv.issuewhere w.created between '01.01.2017' and '01.12.2017' ) s group by author,agreement, _date
              */
-            Connection connection = Utils.getMsSQLConnection();
+            Connection connection = Utils.getCurrentConnection();
             if (connection != null) {
-                /* Postgre here
-                String sql = "select s.author,sum(s.timeworked) as spent,s.agreement, s._month, s._year from (\n" +
-                        "\tselect w.*, cfv.stringvalue as agreement, extract(month from w.created) as _month, extract(year from w.created) as _year from worklog w left join customfieldvalue cfv on w.issueid=cfv.issue\n" +
-                        "\twhere w.created between ? and ?) as s\n" +
-                        "group by author,agreement, _month, _year order by author";*/
-/*
-                String sql = "select s.author,sum(s.timeworked)/3600 as spent,s.agreement, s._month, s._year from " +
-                        "(select w.*, cfv.stringvalue as agreement, month(w.created) as _month, year(w.created) as _year " +
-                        "from worklog w left join customfieldvalue cfv on w.issueid=cfv.issue left join customfield cf on cfv.customfield = cf.id " +
-                        "where cf.cfname='Agreement' and w.created between ? and ?) as s group by author,agreement, _month, _year order by author";
-*/
-
+/* mssql query right, checked
                 String sql = "select f.stringvalue agreement, month(w.created) as _month, year(w.created) as _year, u.display_name as author, "+
                         "sum(w.timeworked) as spent from jiraissue i   " +
                         "left join (select cfv.issue as issueid, cfv.stringvalue from customfieldvalue cfv " +
                         "left outer join customfield cf on cfv.customfield = cf.id where cf.cfname='Agreement') f on f.issueid=i.id " +
                         "left join worklog w on w.issueid=i.id left join cwd_user u on u.user_name=w.author "+
-                        "where u.user_name is not null and w.created between ? and ?" +
+                        "where u.user_name is not null and w.startdate between ? and ?" +
                         " group by u.display_name,f.stringvalue, month(w.created), year(w.created)";
+*/
+/*postgresql query
+ */
+                String sql = "select f.stringvalue agreement, extract(month from w.startdate) as _month, extract(year from w.startdate) as _year, u.display_name as author,"+
+                        "sum(w.timeworked) as spent from jiraissue i "+
+                "left join (select cfv.issue as issueid, cfv.stringvalue from customfieldvalue cfv "+
+                "left outer join customfield cf on cfv.customfield = cf.id where cf.cfname='Agreement') f on f.issueid=i.id "+
+                "left join worklog w on w.issueid=i.id left join cwd_user u on u.user_name=w.author "+
+                "where u.user_name is not null and w.startdate between ? and ? "+
+                "group by u.display_name,f.stringvalue, extract(month from w.startdate), extract(year from w.startdate) "+
+                "order by extract(year from w.startdate), extract(month from w.startdate), u.display_name, f.stringvalue";
 
                 try{
                     PreparedStatement statement = connection.prepareStatement(sql);

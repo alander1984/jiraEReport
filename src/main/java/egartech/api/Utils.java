@@ -1,8 +1,15 @@
 package egartech.api;
 
+import com.atlassian.jira.component.ComponentAccessor;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import com.atlassian.jira.component.ComponentAccessor;
+import org.ofbiz.core.entity.ConnectionFactory;
+import org.ofbiz.core.entity.DelegatorInterface;
+import org.ofbiz.core.entity.GenericEntityException;
+import org.ofbiz.core.entity.jdbc.SQLProcessor;
 
 /**
  * Created by alander on 17.03.17.
@@ -15,8 +22,8 @@ public class Utils {
         try {
 
             connection = DriverManager.getConnection(
-                    "jdbc:postgresql://127.0.0.1:5432/jiradb", "postgres",
-                    "postgresql17");
+                    "jdbc:postgresql://127.0.0.1:5432/jira", "postgres",
+                    "Jira733");
 
         } catch (SQLException e) {
 
@@ -42,6 +49,15 @@ public class Utils {
             e.printStackTrace();
         }
         return connection;
+    }
+
+    public static Connection getCurrentConnection() throws SQLException,GenericEntityException {
+
+        DelegatorInterface delegator = (DelegatorInterface) ComponentAccessor.getComponent(DelegatorInterface.class);
+        String helperName = delegator.getGroupHelperName("default");    // gets the helper (localderby, localmysql, localpostgres, etc.) for your entity group org.ofbiz
+        Connection conn = ConnectionFactory.getConnection(helperName);
+        System.out.print(conn.getMetaData().getURL());
+        return conn;
     }
 
 
