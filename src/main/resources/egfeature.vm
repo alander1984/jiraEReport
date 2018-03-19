@@ -43,6 +43,17 @@
                             <input type="text" class="form-control" placeholder="DD.MM.YYYY" name="edate">
                         </div>
                     </td>
+                    <td>
+                        <div class="spaceddiv">
+                            <label>Group by</label>
+                            <div>
+                                <select name="attribute">
+                                    <option value="Agreement">Agreement</option>
+                                    <option value="Клиент">Клиент</option>
+                                </select>
+                            </div>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td>

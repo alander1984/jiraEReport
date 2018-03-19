@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Created by alander on 17.03.17.
+ * Фабрика ответов плагина mreport
  */
 public class ResponceFactory {
 
@@ -23,10 +23,12 @@ public class ResponceFactory {
         CustomTimedReport report = new CustomTimedReport();
         Date sdate = null;
         Date edate = null;
+        String attribute = null;
         DateFormat format = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
         try {
             sdate = format.parse(req.getParameter("sdate"));
             edate = format.parse(req.getParameter("edate"));
+            attribute = req.getParameter("attribute");
         }
         catch (java.text.ParseException e) {
             resp.sendError(418, "Wrong date format");
@@ -38,7 +40,7 @@ public class ResponceFactory {
         try
         {
             OutputStream outputStream = resp.getOutputStream();
-            report.generate(sdate, edate, outputStream);
+            report.generate(sdate, edate, attribute, outputStream);
             outputStream.flush();
             outputStream.close();
         }

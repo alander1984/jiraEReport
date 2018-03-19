@@ -12,16 +12,29 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-
-
-
 /**
  * Created by alander on 17.03.17.
  */
 public class CustomTimedReport {
 
-
-    public void generate(Date sdate, Date edate, OutputStream result) {
+    /**
+     * Генерирует отчёт за указанный временной период
+     * Таблица customfield - справочник атрибутов, где cfname - название атрибута, id - идентификатор атрибута.
+     * Таблица customfieldoption - справочник значений всех атрибутов,
+     * где customfield - идентификатор атрибута, customvalue - значение атрибута.
+     * Таблица customfieldvalue - хранит значения всех атрибутов каждой issue,
+     * где stringvalue - id значения атрибута из справочника customfieldoption.
+     * Таблица customfieldvalue используется, чтобы получить приджойнить jiraissue по issueid.
+     *
+     * Если в какой-то issue атрибут, по которому происходит группировка, не указан, т.е. является NULL,
+     * то она группируется в группу с названием "Не определено"
+     *
+     * @param sdate дата начала
+     * @param edate дата конца
+     * @param attribute название атрибута, по которому необходимо произвести группировку
+     * @param result
+     */
+    public void generate(Date sdate, Date edate, String attribute, OutputStream result) {
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("monthReport");
         HSSFRow rowfirstempty = sheet.createRow(0);
@@ -52,7 +65,7 @@ public class CustomTimedReport {
             /*
             MSSQL = select s.author,sum(s.timeworked),s.agreement, s._date from (select w.*, cfv.stringvalue as agreement, right(convert(varchar, w.created, 106), 8)  _date from worklog w left join customfieldvalue cfv on w.issueid=cfv.issuewhere w.created between '01.01.2017' and '01.12.2017' ) s group by author,agreement, _date
              */
-            Connection connection = Utils.getCurrentConnection();
+            Connection connection = Utils.getPostgresConnectionToJiradb();
             if (connection != null) {
 /* mssql query right, checked
                 String sql = "select f.stringvalue agreement, month(w.created) as _month, year(w.created) as _year, u.display_name as author, "+
@@ -65,22 +78,44 @@ public class CustomTimedReport {
 */
 /*postgresql query
  */
-                String sql = "select f.stringvalue agreement, extract(month from w.startdate) as _month, extract(year from w.startdate) as _year, u.display_name as author,"+
+                /*String sql = "select f.stringvalue agreement, extract(month from w.startdate) as _month, extract(year from w.startdate) as _year, u.display_name as author,"+
                         "sum(w.timeworked) as spent from jiraissue i "+
                 "left join (select cfv.issue as issueid, cfv.stringvalue from customfieldvalue cfv "+
                 "left outer join customfield cf on cfv.customfield = cf.id where cf.cfname='Agreement') f on f.issueid=i.id "+
                 "left join worklog w on w.issueid=i.id left join cwd_user u on u.user_name=w.author "+
                 "where u.user_name is not null and w.startdate between ? and ? "+
                 "group by u.display_name,f.stringvalue, extract(month from w.startdate), extract(year from w.startdate) "+
-                "order by extract(year from w.startdate), extract(month from w.startdate), u.display_name, f.stringvalue";
+                "order by extract(year from w.startdate), extract(month from w.startdate), u.display_name, f.stringvalue";*/
+                String sql = "SELECT  CASE WHEN f.customvalue is NULL then 'Не определено' else f.customvalue END AS agreement, " +
+                        "        extract(MONTH FROM w.startdate) AS _month, " +
+                        "        extract(YEAR FROM w.startdate)  AS _year, " +
+                        "        u.display_name                  AS author, " +
+                        "        sum(w.timeworked)               AS spent " +
+                        "FROM jiraissue i " +
+                        "  LEFT JOIN ( " +
+                        "    select cfv.issue AS issueid, cfo.customvalue, cfv.customfield FROM customfieldvalue cfv " +
+                        "    left join customfieldoption cfo " +
+                        "    on CAST(cfo.id as TEXT)=cfv.stringvalue " +
+                        "    where cfv.customfield = (select id from customfield where cfname = ?)  " +
+                        "  ) f ON f.issueid = i.id and f.customvalue is not NULL " +
+                        "  LEFT JOIN " +
+                        "  worklog w " +
+                        "    ON w.issueid = i.id " +
+                        "  LEFT JOIN " +
+                        "  cwd_user u " +
+                        "    ON u.user_name = w.author " +
+                        "WHERE u.user_name IS NOT NULL and w.startdate between ? and ? " +
+                        "GROUP BY u.display_name, f.customvalue, extract(MONTH FROM w.startdate), extract(YEAR FROM w.startdate) " +
+                        "ORDER BY extract(YEAR FROM w.startdate), extract(MONTH FROM w.startdate), u.display_name";
 
                 try{
                     PreparedStatement statement = connection.prepareStatement(sql);
                     java.sql.Date ssdate = new java.sql.Date(sdate.getTime());
                     java.sql.Date sedate = new java.sql.Date(edate.getTime());
                     System.out.println(ssdate.toString() +" : "+sedate.toString());
-                    statement.setDate(1, ssdate);
-                    statement.setDate(2, sedate);
+                    statement.setString(1, attribute);
+                    statement.setDate(2, ssdate);
+                    statement.setDate(3, sedate);
                     ResultSet rs = statement.executeQuery();
                     while (rs.next()) {
                         System.out.println("1");
@@ -142,7 +177,4 @@ public class CustomTimedReport {
             e.printStackTrace();
         }
     }
-
-
-
 }

@@ -16,6 +16,26 @@ import org.ofbiz.core.entity.jdbc.SQLProcessor;
  */
 public class Utils {
 
+    /**
+     * Возвращает подключение к jiradb
+     */
+    public static Connection getPostgresConnectionToJiradb() throws ClassNotFoundException {
+        Class.forName("org.postgresql.Driver");
+        Connection connection = null;
+        try {
+
+            connection = DriverManager.getConnection(
+                    "jdbc:postgresql://192.168.11.13:5432/jiradb", "egarreader",
+                    "secret");
+
+        } catch (SQLException e) {
+
+            System.out.println("Connection Failed! Check output console");
+            e.printStackTrace();
+        }
+        return connection;
+    }
+
     public static Connection getPostgresConnection() throws ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
         Connection connection = null;
